@@ -1,9 +1,9 @@
 package main
 
 import (
-	"math/rand"
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"fmt"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"math/rand"
 	"time"
 )
 

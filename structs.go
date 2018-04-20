@@ -11,19 +11,19 @@ type User struct {
 
 type Config struct {
 	// Telegram Bot API token
-	Token       string `required:"true"`
+	Token string `required:"true"`
 	// SOCKS5 address, uses to show it user and for applying proxy settings
-	Addr        string `required:"true"`
+	Addr string `required:"true"`
 	// SOCKS5 port
-	Port        int    `default:"1080"`
+	Port int `default:"1080"`
 	// Private mode
-	Private     bool   `default:"true"`
+	Private bool `default:"true"`
 	// Max limit of accounts
-	Limit       int    `default:"100"`
+	Limit int `default:"100"`
 	// Admin ID to get special features access
-	AdminID     int
+	AdminID int
 	// Proxy for Bot API
-	Proxy       struct {
+	Proxy struct {
 		Addr     string
 		Port     int `default:"1080"`
 		Username string

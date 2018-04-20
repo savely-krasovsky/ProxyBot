@@ -3,21 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/armon/go-socks5"
+	"github.com/L11R/go-socks5"
 	"github.com/asdine/storm"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/jinzhu/configor"
 	"golang.org/x/net/proxy"
 	"log"
 	"math/rand"
 	"net"
 	"net/http"
 	"time"
-	"github.com/jinzhu/configor"
 )
 
 var (
-	bot *tgbotapi.BotAPI
-	db  *storm.DB
+	bot    *tgbotapi.BotAPI
+	db     *storm.DB
 	config Config
 )
 
@@ -111,6 +111,7 @@ func main() {
 		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
 			DB: db,
 		}),
+		ConnLimit: 3,
 	}
 
 	server, err := socks5.New(conf)
@@ -119,7 +120,5 @@ func main() {
 	}
 
 	// Create SOCKS5 proxy on localhost
-	if err := server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port)); err != nil {
-		panic(err)
-	}
+	server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port))
 }

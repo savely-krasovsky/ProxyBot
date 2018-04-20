@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/armon/go-socks5"
+	"github.com/L11R/go-socks5"
 	"github.com/asdine/storm"
 	"io"
 )
