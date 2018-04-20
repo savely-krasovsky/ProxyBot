@@ -24,6 +24,7 @@ var (
 func main() {
 	var err error
 
+	// Load configuration
 	err = configor.Load(&config, "_config.yml")
 	if err != nil {
 		log.Fatal(err)
@@ -91,10 +92,16 @@ func main() {
 			switch update.Message.Command() {
 			case "start":
 				go StartCommand(update)
+			case "redeem":
+				go RedeemCommand(update)
 			case "update":
 				go UpdateCommand(update)
 			case "remove":
 				go RemoveCommand(update)
+			case "make_invitation":
+				if update.Message.From.ID == config.AdminID {
+					go MakeInvitationCommand(update)
+				}
 			}
 		}
 	}()

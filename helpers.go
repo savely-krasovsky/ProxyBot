@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"fmt"
+	"time"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -16,10 +17,19 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
+func GetUserWithRandomCreds(id int) *User {
+	return &User{
+		ID:        id,
+		Username:  fmt.Sprintf("user%d", id),
+		Password:  RandStringBytes(16),
+		CreatedAt: time.Now(),
+	}
+}
+
 func GetApplyButton(username, password string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL("Apply settings", fmt.Sprintf(
+			tgbotapi.NewInlineKeyboardButtonURL("Apply proxy settings", fmt.Sprintf(
 				"https://t.me/socks?server=%s&port=%d&user=%s&pass=%s",
 				config.Addr,
 				config.Port,

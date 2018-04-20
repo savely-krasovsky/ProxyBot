@@ -9,36 +9,49 @@ import (
 	"time"
 )
 
+// Shows all creds, if there is no user in DB, generates new one
 func StartCommand(update tgbotapi.Update) {
 	var user User
 
-	// try to get user
+	// Try to get user
 	err := db.One("ID", update.Message.From.ID, &user)
 	if err != nil {
 		log.Println(err)
 	}
 
-	// if not found generate new creds and save
+	// If not found generate new creds and save
 	if err == storm.ErrNotFound {
-		u := fmt.Sprintf("user%d", update.Message.From.ID)
-		p := RandStringBytes(16)
-		t := time.Now()
-
-		err := db.Save(&User{
-			ID:        update.Message.From.ID,
-			Username:  u,
-			Password:  p,
-			CreatedAt: t,
-		})
+		var users []User
+		err := db.All(&users)
 		if err != nil {
 			log.Println(err)
+			return
+		}
+
+		if len(users) > config.Limit {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Sorry, bot has reached the limit of users! Contact your administrator.`)
+			bot.Send(msg)
+
+			return
+		}
+
+		if !config.Private {
+			err = db.Save(GetUserWithRandomCreds(update.Message.From.ID))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		} else {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Bot is in private mode. Contact your administrator to get invitation code.`)
+			bot.Send(msg)
+
 			return
 		}
 	} else if err != nil {
 		return
 	}
 
-	// if we didn't find user before, but already save
+	// If we didn't find user before, but already save
 	if user == (User{}) {
 		err := db.One("ID", update.Message.From.ID, &user)
 		if err != nil {
@@ -67,15 +80,29 @@ Created at: <code>%s</code>`,
 	bot.Send(msg)
 }
 
+// Updates user, if there are not arguments (username and password) generates defaults
 func UpdateCommand(update tgbotapi.Update) {
 	var user User
-	user.ID = update.Message.From.ID
-	user.CreatedAt = time.Now()
+
+	// Try to get user
+	err := db.One("ID", update.Message.From.ID, &user)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err == storm.ErrNotFound {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Sorry, I can't find you, try to register first: /start`)
+		bot.Send(msg)
+
+		return
+	}
 
 	if update.Message.CommandArguments() == "" {
-		user.Username = fmt.Sprintf("user%d", update.Message.From.ID)
-		user.Password = RandStringBytes(16)
+		user = *GetUserWithRandomCreds(update.Message.From.ID)
 	} else {
+		user.ID = update.Message.From.ID
+		user.CreatedAt = time.Now()
+
 		info := strings.Split(update.Message.CommandArguments(), " ")
 
 		if len(info) == 1 {
@@ -87,7 +114,7 @@ func UpdateCommand(update tgbotapi.Update) {
 		}
 	}
 
-	err := db.Save(&user)
+	err = db.Save(&user)
 	if err != nil {
 		log.Println(err)
 	}
@@ -117,13 +144,14 @@ Created at: <code>%s</code>`,
 	bot.Send(msg)
 }
 
+// Just removes user from DB
 func RemoveCommand(update tgbotapi.Update) {
 	err := db.DeleteStruct(&User{ID: update.Message.From.ID})
 	if err != nil {
 		log.Println(err)
 	}
 
-	// if not found, send message
+	// If not found, send message
 	if err == storm.ErrNotFound {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Your profile already removed from database!`)
 		bot.Send(msg)
@@ -132,5 +160,58 @@ func RemoveCommand(update tgbotapi.Update) {
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Your profile has been removed from database, bye!`)
+	bot.Send(msg)
+}
+
+func MakeInvitationCommand(update tgbotapi.Update) {
+	invID := RandStringBytes(8)
+
+	err := db.Set("invitations", invID, false)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Invitation code: <code>%s</code>", invID))
+	msg.ParseMode = "HTML"
+	bot.Send(msg)
+}
+
+func RedeemCommand(update tgbotapi.Update) {
+	if update.Message.CommandArguments() != "" {
+		var isRedeemed bool
+		err := db.Get("invitations", update.Message.CommandArguments(), &isRedeemed)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		if !isRedeemed {
+			err = db.Save(GetUserWithRandomCreds(update.Message.From.ID))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			err := db.Set("invitations", update.Message.CommandArguments(), true)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, `You invitation code is correct! Click /start to get you credentials.`)
+			bot.Send(msg)
+
+			return
+		} else {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Sorry but your code already redeemed! Contact your administrator to get the new one.`)
+			bot.Send(msg)
+
+			return
+		}
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, `You need pass code as param right after <code>/redeem</code> command!`)
+	msg.ParseMode = "HTML"
 	bot.Send(msg)
 }
