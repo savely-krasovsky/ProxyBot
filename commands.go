@@ -49,9 +49,14 @@ func StartCommand(update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(
 		`Your credentials:
+Server: <code>%s</code>
+Port: <code>%s</code>
 Username: <code>%s</code>
 Password: <code>%s</code>
+
 Created at: <code>%s</code>`,
+		config.Addr,
+		config.Port,
 		user.Username,
 		user.Password,
 		user.CreatedAt.Format("02.01 / 15:04:05 MST"),
@@ -98,6 +103,7 @@ func UpdateCommand(update tgbotapi.Update) {
 		`Your updated credentials:
 Username: <code>%s</code>
 Password: <code>%s</code>
+
 Created at: <code>%s</code>`,
 		user.Username,
 		user.Password,

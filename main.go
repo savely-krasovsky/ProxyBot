@@ -11,60 +11,47 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
-	"os"
 	"time"
+	"github.com/jinzhu/configor"
 )
 
 var (
 	bot *tgbotapi.BotAPI
 	db  *storm.DB
+	config Config
 )
 
 func main() {
 	var err error
 
+	err = configor.Load(&config, "_config.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Random seed
 	rand.Seed(time.Now().UnixNano())
-
-	// Get socks flag
-	socksEnabled := true
-	socksEnabledEnv := os.Getenv("ENABLE_SOCKS")
-	if socksEnabledEnv == "" || socksEnabledEnv == "false" {
-		socksEnabled = false
-	}
-
-	// Get token for Telegram bot
-	token := os.Getenv("TOKEN")
-	if token == "" {
-		log.Fatal("TOKEN env variable not specified!")
-	}
 
 	var tr http.Transport
 
 	// When you dev it in Russia...
-	if socksEnabled {
-		proxyAddr := os.Getenv("PROXY_ADDR")
-		proxyPort := os.Getenv("PROXY_PORT")
-
-		proxyUsername := os.Getenv("PROXY_USERNAME")
-		proxyPassword := os.Getenv("PROXY_PASSWORD")
-
+	if config.Proxy.Addr != "" {
 		useAuth := true
-		if proxyUsername == "" || proxyPassword == "" {
+		if config.Proxy.Username == "" || config.Proxy.Password == "" {
 			useAuth = false
 		}
 
 		var proxyAuth *proxy.Auth
 		if useAuth {
 			proxyAuth = &proxy.Auth{
-				User:     proxyUsername,
-				Password: proxyPassword,
+				User:     config.Proxy.Username,
+				Password: config.Proxy.Password,
 			}
 		}
 
 		tr = http.Transport{
 			DialContext: func(_ context.Context, network, addr string) (net.Conn, error) {
-				socksDialer, err := proxy.SOCKS5("tcp", fmt.Sprintf("%s:%s", proxyAddr, proxyPort), proxyAuth, proxy.Direct)
+				socksDialer, err := proxy.SOCKS5("tcp", fmt.Sprintf("%s:%d", config.Proxy.Addr, config.Proxy.Port), proxyAuth, proxy.Direct)
 				if err != nil {
 					return nil, err
 				}
@@ -75,7 +62,7 @@ func main() {
 	}
 
 	// Bot init
-	bot, err = tgbotapi.NewBotAPIWithClient(token, &http.Client{
+	bot, err = tgbotapi.NewBotAPIWithClient(config.Token, &http.Client{
 		Transport: &tr,
 	})
 	if err != nil {
@@ -125,7 +112,7 @@ func main() {
 	}
 
 	// Create SOCKS5 proxy on localhost
-	if err := server.ListenAndServe("tcp", ":1323"); err != nil {
+	if err := server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port)); err != nil {
 		panic(err)
 	}
 }
