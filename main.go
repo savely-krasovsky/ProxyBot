@@ -114,7 +114,7 @@ func main() {
 
 	// Create a SOCKS5 server
 	conf := &socks5.Config{
-		AuthMethods: append([]socks5.Authenticator{}, socks5.NoAuthAuthenticator{}, DatabaseAuthenticator{
+		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
 			DB: db,
 		}),
 	}
@@ -123,8 +123,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	socks5.PermitAll()
 
 	// Create SOCKS5 proxy on localhost
 	if err := server.ListenAndServe("tcp", ":1323"); err != nil {
