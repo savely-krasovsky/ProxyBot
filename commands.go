@@ -48,9 +48,10 @@ func StartCommand(update tgbotapi.Update) {
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(
-		`Your credentials:
+		`<b>Your credentials:</b>
+
 Server: <code>%s</code>
-Port: <code>%s</code>
+Port: <code>%d</code>
 Username: <code>%s</code>
 Password: <code>%s</code>
 
@@ -62,6 +63,7 @@ Created at: <code>%s</code>`,
 		user.CreatedAt.Format("02.01 / 15:04:05 MST"),
 	))
 	msg.ParseMode = "HTML"
+	msg.ReplyMarkup = GetApplyButton(user.Username, user.Password)
 	bot.Send(msg)
 }
 
@@ -100,7 +102,8 @@ func UpdateCommand(update tgbotapi.Update) {
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(
-		`Your updated credentials:
+		`<b>Your updated credentials:</b>
+
 Username: <code>%s</code>
 Password: <code>%s</code>
 
@@ -110,6 +113,7 @@ Created at: <code>%s</code>`,
 		user.CreatedAt.Format("02.01 / 15:04:05 MST"),
 	))
 	msg.ParseMode = "HTML"
+	msg.ReplyMarkup = GetApplyButton(user.Username, user.Password)
 	bot.Send(msg)
 }
 
