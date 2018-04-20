@@ -1,5 +1,5 @@
 # ProxyBot
-Ready to deploy Telegram Bot with embedded database to store users credentials. Great for deployment and using in small communities and chats.
+Ready to deploy SOCKS5 server and Telegram Bot with embedded database to store users credentials. Great for deployment and using in small communities and chats.
 
 # Config
 To start using bot you need `_config.yml` file:
