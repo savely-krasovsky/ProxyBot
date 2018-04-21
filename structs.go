@@ -17,9 +17,11 @@ type Config struct {
 	// SOCKS5 port
 	Port int `default:"1080"`
 	// Private mode
-	Private bool `default:"true"`
+	Private bool
 	// Max limit of accounts
 	Limit int `default:"100"`
+	// Max sessions per user
+	SessionsPerUser int `default:"3"`
 	// Admin ID to get special features access
 	AdminID int
 	// Proxy for Bot API
