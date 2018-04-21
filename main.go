@@ -111,6 +111,7 @@ func main() {
 		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
 			DB: db,
 		}),
+		SessionsPerUser: 1,
 	}
 
 	server, err := socks5.New(conf)
@@ -119,5 +120,5 @@ func main() {
 	}
 
 	// Create SOCKS5 proxy on localhost
-	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port), config.Connslimit)
+	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port))
 }

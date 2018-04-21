@@ -28,7 +28,7 @@ func StartCommand(update tgbotapi.Update) {
 			return
 		}
 
-		if len(users) > config.Userslimit {
+		if len(users) > config.Limit {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, `Sorry, bot has reached the limit of users! Contact your administrator.`)
 			bot.Send(msg)
 
