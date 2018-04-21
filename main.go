@@ -119,5 +119,5 @@ func main() {
 	}
 
 	// Create SOCKS5 proxy on localhost
-	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port), config.ConnsLimit)
+	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port), config.Connslimit)
 }
