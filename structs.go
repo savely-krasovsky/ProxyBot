@@ -19,7 +19,9 @@ type Config struct {
 	// Private mode
 	Private bool `default:"true"`
 	// Max limit of accounts
-	Limit int `default:"100"`
+	UsersLimit int `default:"100"`
+	// Max limit of connections
+	ConnsLimit int `default:"300"`
 	// Admin ID to get special features access
 	AdminID int
 	// Proxy for Bot API
