@@ -88,5 +88,10 @@ func (a DatabaseAuthenticator) Authenticate(reader io.Reader, writer io.Writer) 
 	}
 
 	// Done
-	return &socks5.AuthContext{socks5.UserPassAuth, map[string]string{"Username": string(username)}}, nil
+	return &socks5.AuthContext{
+		Method: socks5.UserPassAuth,
+		Payload: map[string]string{
+			"Username": string(username),
+		},
+	}, nil
 }
