@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/L11R/go-socks5"
 	"github.com/asdine/storm"
+	"go-socks5"
 	"io"
 )
 
@@ -37,7 +37,7 @@ func (a DatabaseAuthenticator) Authenticate(reader io.Reader, writer io.Writer) 
 
 	// Ensure we are compatible
 	if header[0] != userAuthVersion {
-		return nil, fmt.Errorf("Unsupported auth version: %v", header[0])
+		return nil, fmt.Errorf("unsupported auth version: %v", header[0])
 	}
 
 	// Get the username

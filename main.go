@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/L11R/go-socks5"
 	"github.com/asdine/storm"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jinzhu/configor"
+	"go-socks5"
 	"golang.org/x/net/proxy"
 	"log"
 	"math/rand"
@@ -111,7 +111,6 @@ func main() {
 		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
 			DB: db,
 		}),
-		ConnLimit: 3,
 	}
 
 	server, err := socks5.New(conf)
@@ -120,5 +119,5 @@ func main() {
 	}
 
 	// Create SOCKS5 proxy on localhost
-	server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port))
+	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port))
 }
