@@ -111,7 +111,7 @@ func main() {
 		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
 			DB: db,
 		}),
-		SessionsPerUser: config.SessionsPerUser,
+		ConnectionsPerUser: config.ConnectionsPerUser,
 	}
 
 	server, err := socks5.New(conf)
