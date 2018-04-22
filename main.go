@@ -107,8 +107,8 @@ func main() {
 	}()
 
 	// Create a SOCKS5 server
-	conf := &socks5.Config{
-		AuthValid: func(username, password string) bool {
+	conf := &socks.Config{
+		ValidAuth: func(username, password string) bool {
 			// Get users from db
 			var user User
 			err := db.One("Username", username, &user)
@@ -125,11 +125,11 @@ func main() {
 		ConnsPerUser: config.ConnsPerUser,
 	}
 
-	server := socks5.New(conf)
+	server := socks.NewServer(conf)
 
 	// Create SOCKS5 proxy on localhost
 	err = server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
-		fmt.Printf("ERROR: %v", err)
+		log.Println("ERROR: ", err.Error())
 	}
 }
