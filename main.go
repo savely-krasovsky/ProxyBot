@@ -130,6 +130,6 @@ func main() {
 	// Create SOCKS5 proxy on localhost
 	err = server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
-		panic(err)
+		fmt.Printf("ERROR: %v", err)
 	}
 }
