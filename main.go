@@ -123,6 +123,7 @@ func main() {
 			return true
 		},
 		ConnsPerUser: config.ConnsPerUser,
+		Verbose:      config.Verbose,
 	}
 
 	server := socks.NewServer(conf)

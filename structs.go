@@ -31,4 +31,6 @@ type Config struct {
 		Username string
 		Password string
 	}
+	// Verbose logs
+	Verbose bool
 }
