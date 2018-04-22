@@ -21,7 +21,7 @@ type Config struct {
 	// Max limit of accounts
 	Limit int `default:"100"`
 	// Max connections per user
-	ConnectionsPerUser int `default:"10"`
+	ConnsPerUser int `default:"10"`
 	// Admin ID to get special features access
 	AdminID int
 	// Proxy for Bot API

@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/L11R/go-socks-telegram"
 	"github.com/asdine/storm"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jinzhu/configor"
-	"go-socks5"
 	"golang.org/x/net/proxy"
 	"log"
 	"math/rand"
@@ -108,17 +108,28 @@ func main() {
 
 	// Create a SOCKS5 server
 	conf := &socks5.Config{
-		AuthMethods: append([]socks5.Authenticator{}, DatabaseAuthenticator{
-			DB: db,
-		}),
-		ConnectionsPerUser: config.ConnectionsPerUser,
+		AuthValid: func(username, password string) bool {
+			// Get users from db
+			var user User
+			err := db.One("Username", username, &user)
+
+			// User not found, auth failure
+			if err == storm.ErrNotFound {
+				return false
+			} else if err != nil {
+				return false
+			}
+
+			return true
+		},
+		ConnsPerUser: config.ConnsPerUser,
 	}
 
-	server, err := socks5.New(conf)
+	server := socks5.New(conf)
+
+	// Create SOCKS5 proxy on localhost
+	err = server.ListenAndServe("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
 		panic(err)
 	}
-
-	// Create SOCKS5 proxy on localhost
-	server.ListenAndServe("tcp4", fmt.Sprintf(":%d", config.Port))
 }
