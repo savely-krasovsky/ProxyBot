@@ -4,28 +4,34 @@ Ready to deploy SOCKS5 server and Telegram Bot with embedded database to store u
 # Config
 To start using bot you need `_config.yml` file:
 ```yaml
-// Required params
+# Required params
 token: telegram_bot_token
 addr: fdqn_or_ip
 
-// Optionally you can change port, but 1080 is default
+# Optionally you can change port, but 1080 is default
 port: 1080
 
-// In private mode, bot will require adding user manually, else it will just register anyone automatically
+# In private mode, bot will require adding user manually, else it will just register anyone automatically
 private: true
 
-// Also you can change limit of maximum users, 100 is default
+# Also you can change limit of maximum users, 100 is default
 limit: 100
 
-// Setting admin id will give access to admin commands
+# Connections limit per user
+connsperuser: 10
+
+# Setting admin id will give access to admin commands
 adminid: 123456
 
-// Only for development with restricted api.telegram.org
+# Only for development with restricted api.telegram.org
 proxy:
     addr: fdqn_or_ip
     port: 1080
     username: user
     password: pass
+    
+# Verbose logs
+verbose: false
 ```
 
 # Commands
