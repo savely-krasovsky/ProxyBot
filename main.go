@@ -102,6 +102,10 @@ func main() {
 				if update.Message.From.ID == config.AdminID {
 					go MakeInvitationCommand(update)
 				}
+			case "stats":
+				if update.Message.From.ID == config.AdminID {
+					go StatsCommand(update)
+				}
 			}
 		}
 	}()

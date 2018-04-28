@@ -215,3 +215,27 @@ func RedeemCommand(update tgbotapi.Update) {
 	msg.ParseMode = "HTML"
 	bot.Send(msg)
 }
+
+func StatsCommand(update tgbotapi.Update) {
+	var users []User
+	err := db.All(&users)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(
+		update.Message.Chat.ID,
+		fmt.Sprintf(
+			`<b>Current server stats:</b>
+
+Total users: <code>%d</code>
+
+Requested at: <code>%s</code>`,
+			len(users),
+			time.Now().Format("02.01 / 15:04:05 MST"),
+		),
+	)
+	msg.ParseMode = "HTML"
+	bot.Send(msg)
+}
